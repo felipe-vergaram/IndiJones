@@ -39,7 +39,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 
   </node-->
   <node pkg="explore_lite" type="explore" respawn="false" name="explore" output="screen">
-    <rosparam file="$(find husky_navigation)/config/exploration_lite.yaml" command="load" />
+    <rosparam file="$(find indi_jones)/config/exploration.yaml" command="load" />
   </node>
 
 </launch>
