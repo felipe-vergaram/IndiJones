@@ -2,8 +2,8 @@
 <!--
 Software License Agreement (BSD)
 
-\file      exploration.launch
-\authors   Paul Bovbel <pbovbel@clearpathrobotics.com>
+\file      gmapping.launch
+\authors   Paul Bovbel <pbovbel@clearpathrobotics.com>, Prasenjit Mukherjee <pmukherj@clearpathrobotics.com>
 \copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that
@@ -24,20 +24,49 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCL
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <launch>
-  <!-- Run Husky_Playpen-->
-  <include file="$(find husky_gazebo)/launch/husky_playpen.launch" />
 
-  <!--- Run gmapping -->
-  <include file="$(find indi_jones)/launch/gmapping.launch" />
+  <arg name="scan_topic" default="$(eval optenv('HUSKY_LASER_TOPIC', 'scan'))" />
 
-  <!--- Run Move Base -->
-  <include file="$(find husky_navigation)/launch/move_base.launch" />
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping">
+    <rosparam>
+      odom_frame: odom
+      base_frame: base_link
+      map_frame: map
 
-  <!--Run RViz-->
-  <include file="$(find indi_jones)/launch/view_robot.launch" />
-  <!--include file="$(find husky_viz)/launch/view_robot.launch" /-->
+      map_update_interval: 0.5 # Publish new map
 
-  <!-- Run Frontier Exploration -->
-  <include file="$(find indi_jones)/launch/exploration.launch" />
+      maxUrange: 5.5 # Should be just less than sensor range
+      maxRange: 6.1 # Should be just greater than sensor range
+      particles: 100 # Increased from 80
 
+      # Update frequencies
+      linearUpdate: 0.3
+      angularUpdate: 0.5
+      temporalUpdate: 2.0
+      resampleThreshold: 0.5
+
+      # Initial Map Size
+      xmin: -20.0
+      ymin: -20.0
+      xmax: 20.0
+      ymax: 20.0
+      delta: 0.05
+
+      # All default
+      sigma: 0.05
+      kernelSize: 1
+      lstep: 0.05
+      astep: 0.05
+      iterations: 5
+      lsigma: 0.075
+      ogain: 3.0
+      lskip: 0
+      llsamplerange: 0.01
+      llsamplestep: 0.01
+      lasamplerange: 0.005
+      lasamplestep: 0.005
+
+    </rosparam>
+    <remap from="scan" to="$(arg scan_topic)"/>
+  </node>
 </launch>
